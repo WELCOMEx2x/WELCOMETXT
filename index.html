@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #06110b;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        #welcome-text {
+            font-size: 2em;
+            margin: 20px;
+        }
+
+        #input-form {
+            margin: 20px;
+        }
+
+        #user-url {
+            font-size: 1.2em;
+            color: lightgreen;
+            margin: 20px;
+            word-break: break-word; /* Asegura que los URLs largos se ajusten */
+        }
+
+        #admin-list {
+            display: none;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid white;
+            border-radius: 10px;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+
+        #admin-list h3 {
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        #admin-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        #admin-list li {
+            color: lightblue;
+            margin: 5px 0;
+            word-break: break-word;
+        }
+
+        #admin-button {
+            position: absolute;
+            bottom: 20px;
+            font-size: 1em;
+            padding: 10px 20px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #admin-button:hover {
+            background: #444;
+        }
+    </style>
+</head>
+<body>
+    <div id="welcome-text">BIENVENIDO</div>
+    <form id="input-form">
+        <label for="user-name">Ingresa tu nombre o nick de Discord:</label><br>
+        <input type="text" id="user-name" required placeholder="Tu nombre o nick"><br><br>
+        <button type="submit">Generar URL</button>
+    </form>
+    <div id="user-url"></div>
+    <button id="admin-button">Soy Administrador</button>
+    <div id="admin-list">
+        <h3>Lista de Usuarios y URLs Generados</h3>
+        <ul id="admin-urls"></ul>
+    </div>
+
+    <script>
+        const adminKey = "admin123"; // Clave secreta para el acceso de administrador
+        const userData = []; // Array para almacenar los datos de los usuarios
+
+        // Elementos del DOM
+        const inputForm = document.getElementById("input-form");
+        const userNameInput = document.getElementById("user-name");
+        const userURLDisplay = document.getElementById("user-url");
+        const adminButton = document.getElementById("admin-button");
+        const adminList = document.getElementById("admin-list");
+        const adminURLs = document.getElementById("admin-urls");
+
+        // Función para generar URLs únicos
+        function generateRandomURL() {
+            const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-";
+            let result = "";
+            for (let i = 0; i < 40; i++) { // Longitud del URL
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        // Manejar el formulario de ingreso de nombre/nick
+        inputForm.addEventListener("submit", (e) => {
+            e.preventDefault(); // Evitar recargar la página
+            const userName = userNameInput.value.trim();
+            if (userName) {
+                const userURL = generateRandomURL();
+                userData.push({ name: userName, url: userURL }); // Guardar el nombre y el URL en el array
+                userURLDisplay.textContent = `Hola, ${userName}. Tu URL único es: ${userURL}`;
+                userNameInput.value = ""; // Limpiar el campo de entrada
+            }
+        });
+
+        // Botón para activar el modo administrador
+        adminButton.addEventListener("click", () => {
+            const inputKey = prompt("Ingrese la clave de administrador:");
+            if (inputKey === adminKey) {
+                showAdminPanel();
+            } else {
+                alert("Clave incorrecta.");
+            }
+        });
+
+        // Mostrar el panel de administrador
+        function showAdminPanel() {
+            adminList.style.display = "block"; // Mostrar el panel
+            adminURLs.innerHTML = ""; // Limpiar la lista
+            userData.forEach((data, index) => {
+                const li = document.createElement("li");
+                li.textContent = `${index + 1}: ${data.name} - ${data.url}`;
+                adminURLs.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>
