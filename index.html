@@ -9,14 +9,9 @@
             margin: 0;
             padding: 0;
             background-color: #06110b;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
             color: white;
             font-family: Arial, sans-serif;
+            text-align: center;
         }
 
         #welcome-text {
@@ -32,25 +27,16 @@
             font-size: 1.2em;
             color: lightgreen;
             margin: 20px;
-            word-break: break-word;
         }
 
         #admin-list {
             display: none;
-            position: absolute;
-            top: 10px;
-            left: 10px;
             padding: 20px;
             background: rgba(0, 0, 0, 0.8);
             border: 1px solid white;
             border-radius: 10px;
             max-height: 80%;
             overflow-y: auto;
-        }
-
-        #admin-list h3 {
-            color: white;
-            margin-bottom: 10px;
         }
 
         #admin-list ul {
@@ -64,11 +50,9 @@
             word-break: break-word;
         }
 
-        #admin-button {
-            position: absolute;
-            bottom: 20px;
-            font-size: 1em;
+        button {
             padding: 10px 20px;
+            font-size: 1em;
             background: #333;
             color: white;
             border: none;
@@ -76,7 +60,7 @@
             cursor: pointer;
         }
 
-        #admin-button:hover {
+        button:hover {
             background: #444;
         }
     </style>
@@ -95,13 +79,25 @@
         <ul id="admin-urls"></ul>
     </div>
 
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
     <script>
-        const adminKey = "admin123"; // Clave secreta para el acceso de administrador
+        // Configuración de Firebase (reemplaza con tus datos)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAU2m5zcJ_w8_8oV4xwguTQmUKw4EhOql0",
+            authDomain: "welcome-957bd.firebaseapp.com",
+            databaseURL: "https://welcome-957bd-default-rtdb.firebaseio.com",
+            projectId: "welcome-957bd",
+            storageBucket: "welcome-957bd.firebasestorage.app",
+            messagingSenderId: "1098924565487",
+            appId: "1:1098924565487:web:61cac9b1e10fe2ca320c1a"
+        };
 
-        // Recuperar datos guardados en localStorage
-        const userData = JSON.parse(localStorage.getItem("userData")) || [];
+        // Inicializar Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-        // Elementos del DOM
         const inputForm = document.getElementById("input-form");
         const userNameInput = document.getElementById("user-name");
         const userURLDisplay = document.getElementById("user-url");
@@ -109,47 +105,54 @@
         const adminList = document.getElementById("admin-list");
         const adminURLs = document.getElementById("admin-urls");
 
-        // Función para generar URLs únicos
+        // Generar URLs únicos
         function generateRandomURL() {
             const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-";
             let result = "";
-            for (let i = 0; i < 40; i++) { // Longitud del URL
+            for (let i = 0; i < 40; i++) {
                 result += characters.charAt(Math.floor(Math.random() * characters.length));
             }
             return result;
         }
 
-        // Manejar el formulario de ingreso de nombre/nick
+        // Manejar el formulario
         inputForm.addEventListener("submit", (e) => {
-            e.preventDefault(); // Evitar recargar la página
+            e.preventDefault();
             const userName = userNameInput.value.trim();
             if (userName) {
                 const userURL = generateRandomURL();
-                userData.push({ name: userName, url: userURL }); // Guardar el nombre y el URL en el array
-                localStorage.setItem("userData", JSON.stringify(userData)); // Guardar datos en localStorage
+                const newUser = { name: userName, url: userURL };
+
+                // Guardar datos en Firebase
+                firebase.database().ref("users").push(newUser);
+
                 userURLDisplay.textContent = `Hola, ${userName}. Tu URL único es: ${userURL}`;
-                userNameInput.value = ""; // Limpiar el campo de entrada
+                userNameInput.value = "";
             }
         });
 
-        // Botón para activar el modo administrador
+        // Modo administrador
         adminButton.addEventListener("click", () => {
             const inputKey = prompt("Ingrese la clave de administrador:");
-            if (inputKey === adminKey) {
+            if (inputKey === "admin123") {
                 showAdminPanel();
             } else {
                 alert("Clave incorrecta.");
             }
         });
 
-        // Mostrar el panel de administrador
         function showAdminPanel() {
-            adminList.style.display = "block"; // Mostrar el panel
-            adminURLs.innerHTML = ""; // Limpiar la lista
-            userData.forEach((data, index) => {
-                const li = document.createElement("li");
-                li.textContent = `${index + 1}: ${data.name} - ${data.url}`;
-                adminURLs.appendChild(li);
+            adminList.style.display = "block";
+            adminURLs.innerHTML = "";
+
+            // Obtener datos desde Firebase
+            firebase.database().ref("users").once("value", (snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    const li = document.createElement("li");
+                    li.textContent = `${data.name} - ${data.url}`;
+                    adminURLs.appendChild(li);
+                });
             });
         }
     </script>
