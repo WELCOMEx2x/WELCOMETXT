@@ -1,160 +1,23 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenido</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #06110b;
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-
-        #welcome-text {
-            font-size: 2em;
-            margin: 20px;
-        }
-
-        #input-form {
-            margin: 20px;
-        }
-
-        #user-url {
-            font-size: 1.2em;
-            color: lightgreen;
-            margin: 20px;
-        }
-
-        #admin-list {
-            display: none;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid white;
-            border-radius: 10px;
-            max-height: 80%;
-            overflow-y: auto;
-        }
-
-        #admin-list ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        #admin-list li {
-            color: lightblue;
-            margin: 5px 0;
-            word-break: break-word;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 1em;
-            background: #333;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #444;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Console</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="welcome-text">BIENVENIDO</div>
-    <form id="input-form">
-        <label for="user-name">Ingresa tu nombre o nick de Discord:</label><br>
-        <input type="text" id="user-name" required placeholder="Tu nombre o nick"><br><br>
-        <button type="submit">Generar URL</button>
-    </form>
-    <div id="user-url"></div>
-    <button id="admin-button">Soy Administrador</button>
-    <div id="admin-list">
-        <h3>Lista de Usuarios y URLs Generados</h3>
-        <ul id="admin-urls"></ul>
+  <div class="container">
+    <div class="login-box">
+      <h1>Login</h1>
+      <form id="loginForm">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+      </form>
+      <p id="errorMessage"></p>
     </div>
-
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
-    <script>
-        // Configuración de Firebase (reemplaza con tus datos)
-        const firebaseConfig = {
-            apiKey: "AIzaSyAU2m5zcJ_w8_8oV4xwguTQmUKw4EhOql0",
-            authDomain: "welcome-957bd.firebaseapp.com",
-            databaseURL: "https://welcome-957bd-default-rtdb.firebaseio.com",
-            projectId: "welcome-957bd",
-            storageBucket: "welcome-957bd.firebasestorage.app",
-            messagingSenderId: "1098924565487",
-            appId: "1:1098924565487:web:61cac9b1e10fe2ca320c1a"
-        };
-
-        // Inicializar Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        const inputForm = document.getElementById("input-form");
-        const userNameInput = document.getElementById("user-name");
-        const userURLDisplay = document.getElementById("user-url");
-        const adminButton = document.getElementById("admin-button");
-        const adminList = document.getElementById("admin-list");
-        const adminURLs = document.getElementById("admin-urls");
-
-        // Generar URLs únicos
-        function generateRandomURL() {
-            const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-";
-            let result = "";
-            for (let i = 0; i < 40; i++) {
-                result += characters.charAt(Math.floor(Math.random() * characters.length));
-            }
-            return result;
-        }
-
-        // Manejar el formulario
-        inputForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const userName = userNameInput.value.trim();
-            if (userName) {
-                const userURL = generateRandomURL();
-                const newUser = { name: userName, url: userURL };
-
-                // Guardar datos en Firebase
-                firebase.database().ref("users").push(newUser);
-
-                userURLDisplay.textContent = `Hola, ${userName}. Tu URL único es: ${userURL}`;
-                userNameInput.value = "";
-            }
-        });
-
-        // Modo administrador
-        adminButton.addEventListener("click", () => {
-            const inputKey = prompt("Ingrese la clave de administrador:");
-            if (inputKey === "admin123") {
-                showAdminPanel();
-            } else {
-                alert("Clave incorrecta.");
-            }
-        });
-
-        function showAdminPanel() {
-            adminList.style.display = "block";
-            adminURLs.innerHTML = "";
-
-            // Obtener datos desde Firebase
-            firebase.database().ref("users").once("value", (snapshot) => {
-                snapshot.forEach((childSnapshot) => {
-                    const data = childSnapshot.val();
-                    const li = document.createElement("li");
-                    li.textContent = `${data.name} - ${data.url}`;
-                    adminURLs.appendChild(li);
-                });
-            });
-        }
-    </script>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>
