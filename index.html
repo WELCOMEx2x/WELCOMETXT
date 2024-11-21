@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Console</title>
+  <title>Firebase Anonymous Login</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,13 +11,47 @@
     <div class="login-box">
       <h1>Login</h1>
       <form id="loginForm">
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <button type="submit">Login</button>
+        <button type="submit">Login Anonymously</button>
       </form>
-      <p id="errorMessage"></p>
+      <p id="statusMessage"></p>
     </div>
   </div>
-  <script src="script.js" defer></script>
+  <script type="module">
+    // Import Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCYxCpYjsTlU1yF7y1AINvk1ZMKHJ5FJ3s",
+      authDomain: "asdasd-282ba.firebaseapp.com",
+      projectId: "asdasd-282ba",
+      storageBucket: "asdasd-282ba.firebasestorage.app",
+      messagingSenderId: "1019315635808",
+      appId: "1:1019315635808:web:200f0736a71dacb6196505",
+      measurementId: "G-GB6N7ERB7F"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Handle anonymous login
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      signInAnonymously(auth)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          document.getElementById('statusMessage').innerText = `Logged in anonymously! User ID: ${user.uid}`;
+          console.log("User signed in:", user);
+        })
+        .catch((error) => {
+          const errorMessage = error.message;
+          document.getElementById('statusMessage').innerText = `Error: ${errorMessage}`;
+          console.error("Error during sign-in:", error);
+        });
+    });
+  </script>
 </body>
 </html>
